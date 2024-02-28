@@ -4,13 +4,32 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
+  
 }
 
 .card {
   width: 100%;
-  max-width: 400px;
+  max-width: 500px;
   padding: 20px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  max-height: 80vh; /* Set max height for the card */
+}
+
+.card::-webkit-scrollbar {
+  width: 0.5em;
+}
+
+.card::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+.card::-webkit-scrollbar-thumb {
+  background-color: white;
+}
+
+.card::-webkit-scrollbar-thumb:hover {
+  background-color: white;
 }
 
 .form-label {
