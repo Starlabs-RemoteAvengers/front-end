@@ -150,6 +150,18 @@ const RegisterPatient = () => {
               onChange={handleInputChange}
               required
             />
+            <label htmlFor="address" className="form-label">
+              Address
+            </label>
+            <input
+              type="text"
+              className="form-input"
+              id="address"
+              name="address"
+              value={formData.address}
+              onChange={handleInputChange}
+              required
+            />
 
             <label htmlFor="personalNumber" className="form-label">
               Personal Number
@@ -207,7 +219,8 @@ const RegisterPatient = () => {
                 Female
               </label>
             </div>
-<br></br>
+            <br/>
+
             <label htmlFor="dateOfBirth" className="form-label">Date of Birth</label>
             <input type="date" className="form-input" id="dateOfBirth" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleInputChange} required />
 
