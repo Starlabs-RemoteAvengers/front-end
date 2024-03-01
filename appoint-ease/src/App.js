@@ -15,12 +15,11 @@ import { useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import ClinicProfile from './Clinic/ClinicProfile';
 
-const PrivateRoute = ({ element: Element, isLoggedIn, userId, token, ...rest }) => (
-  <Route
-    {...rest}
-    render={props => isLoggedIn ? <Element userId={userId} token={token} {...props} /> : <Navigate to="/" />}
-  />
+const PrivateRoute = ({ element: Element, isLoggedIn, ...rest }) => (
+  isLoggedIn ? <Route {...rest} element={<Element />} /> : <Navigate to="/" />
 );
+
+
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -70,72 +69,34 @@ const App = () => {
               )}
             </div>
             
-              <Routes> 
-              <Route path="/home" element={<Home />} /> 
-                {isLoggedIn ? (
-                  <>
-                   
-                    <Route
-                      path="/clinic-dashboard"
-                      element={<ClinicDashboard />}
-                      isLoggedIn={isLoggedIn}
-                      userId={userId}
-                      token={token}
-                    />
-                    <Route
-                      path="/doctor-list"
-                      element={<DoctorList userId={userId} />}
-                      isLoggedIn={isLoggedIn}
-                      userId={userId}
-                      token={token}
-                    />
-                    <Route
-                      path="/create-doctor"
-                      element={<CreateDoctor userId={userId} />}
-                      isLoggedIn={isLoggedIn}
-                      userId={userId}
-                      token={token}
-                    />
-                    <Route
-                      path="/edit-doctor/:id"
-                      element={<EditDoctor />}
-                      isLoggedIn={isLoggedIn}
-                      userId={userId}
-                      token={token}
-                    />
-                     <Route
-                      path="/clinic-profile"
-                      element={<ClinicProfile userId={userId}/>}
-                      isLoggedIn={isLoggedIn}
-                      userId={userId}
-                      token={token}
-                    />
-                    {/* Add other logged-in user routes here */}
-                  </>
-                ) : (
-                  <>
-                    <Route
-                      path="/login"
-                      element={<LoginForm handleLogin={handleLogin} />}
-                    />
-                    <Route
-                      path="/register-patient"
-                      element={<RegisterPatient />}
-                    />
-                    <Route
-                      path="/register-clinic"
-                      element={<RegisterClinic />}
-                    />
-                    {/* Add other routes for non-logged-in users here */}
-                  </>
-                )}
-                {/* Redirect to home if trying to access login while logged in */}
-                {isLoggedIn && <Route path="/login" element={<Navigate to="/home" />} />}
-                {isLoggedIn && <Route path="/register-patient" element={<Navigate to="/home" />} />}
-              </Routes>
-            </div>
+            <Routes>
+              <Route path="/home" element={<Home />} />
+              
+              {isLoggedIn ? (
+                <>
+                  <PrivateRoute path="/clinic-dashboard" element={<ClinicDashboard />} />
+                  <PrivateRoute path="/doctor-list" element={<DoctorList userId={userId} />} />
+                  <PrivateRoute path="/create-doctor" element={<CreateDoctor userId={userId} />} />
+                  <PrivateRoute path="/edit-doctor/:id" element={<EditDoctor />} />
+                  <PrivateRoute path="/clinic-profile" element={<ClinicProfile userId={userId} />} />
+                  {/* Add other logged-in user routes here */}
+                </>
+              ) : (
+                <>
+                  <Route path="/login" element={<LoginForm handleLogin={handleLogin} />} />
+                  <Route path="/register-patient" element={<RegisterPatient />} />
+                  <Route path="/register-clinic" element={<RegisterClinic />} />
+                  {/* Add other routes for non-logged-in users here */}
+                </>
+              )}
+              
+              {/* Redirect to home if trying to access login while logged in */}
+              {isLoggedIn && <Route path="/login" element={<Navigate to="/home" />} />}
+              {isLoggedIn && <Route path="/register-patient" element={<Navigate to="/home" />} />}
+            </Routes>
           </div>
-        </div> 
+        </div>
+      </div>
     </Router>
   );
 };
