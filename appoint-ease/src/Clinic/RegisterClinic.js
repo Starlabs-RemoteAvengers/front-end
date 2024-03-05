@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import '../Css/Register.css';
 import RegistrationLinks from '../RegistrationLinks';
 
-const RegisterClinic = () => {
+const RegisterClinic = () =>
+{
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -21,7 +22,8 @@ const RegisterClinic = () => {
     Doctors: [], // Added doctors
   });
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e) =>
+  {
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -29,13 +31,17 @@ const RegisterClinic = () => {
     });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e) =>
+  {
     e.preventDefault();
 
-    try {
-      const convertKeysToPascalCase = (data) => {
+    try
+    {
+      const convertKeysToPascalCase = (data) =>
+      {
         const convertedData = {};
-        for (const key in data) {
+        for (const key in data)
+        {
           const pascalCaseKey = key.charAt(0).toUpperCase() + key.slice(1);
           convertedData[pascalCaseKey] = data[key];
         }
@@ -50,7 +56,8 @@ const RegisterClinic = () => {
         body: JSON.stringify(convertKeysToPascalCase(formData)),
       });
 
-      if (response.ok) {
+      if (response.ok)
+      {
         const result = await response.json();
         console.log('Registration successful:', result);
         navigate('/login');
@@ -68,10 +75,12 @@ const RegisterClinic = () => {
           OtherDetails: '', // Added otherDetails
           Doctors: [], // Added doctors
         });
-      } else {
+      } else
+      {
         console.error('Registration failed:', response.statusText);
       }
-    } catch (error) {
+    } catch (error)
+    {
       console.error('Error during registration:', error);
     }
   };
@@ -82,7 +91,7 @@ const RegisterClinic = () => {
         <RegistrationLinks />
         <div className="card-body" style={{ marginTop: '10%' }}>
           <form onSubmit={handleSubmit}>
-         
+
 
             <label htmlFor="userName" className="form-label">User Name</label>
             <input type="text" className="form-input" id="userName" name="userName" value={formData.userName} onChange={handleInputChange} required />
@@ -92,12 +101,12 @@ const RegisterClinic = () => {
 
             <label htmlFor="surname" className="form-label">Surname</label>
             <input type="text" className="form-input" id="surname" name="surname" value={formData.surname} onChange={handleInputChange} required />
-            
+
             <label htmlFor="email" className="form-label">Email</label>
-            <input type="email" className="form-input" id="email" name="email" value={formData.email} onChange={handleInputChange} required/>
+            <input type="email" className="form-input" id="email" name="email" value={formData.email} onChange={handleInputChange} required />
 
             <label htmlFor="password" className="form-label">Password</label>
-            <input type="password" className="form-input" id="password" name="password" value={formData.password} onChange={handleInputChange} required/>
+            <input type="password" className="form-input" id="password" name="password" value={formData.password} onChange={handleInputChange} required />
             <label htmlFor="address" className="form-label">Address</label>
             <input type="text" className="form-input" id="address" name="address" value={formData.address} onChange={handleInputChange} required />
 
@@ -106,7 +115,7 @@ const RegisterClinic = () => {
 
             <label htmlFor="location" className="form-label">Location</label>
             <input type="text" className="form-input" id="location" name="location" value={formData.location} onChange={handleInputChange} required />
-            
+
             <label htmlFor="createdDate" className="form-label">Created Date</label>
             <input type="date" className="form-input" id="createdDate" name="createdDate" value={formData.createdDate} onChange={handleInputChange} required />
 
@@ -114,7 +123,7 @@ const RegisterClinic = () => {
             <input type="text" className="form-input" id="otherDetails" name="otherDetails" value={formData.otherDetails} onChange={handleInputChange} required />
 
             <div className="d-flex mt-3 justify-content-end">
-              <button type="submit" className="btn btn-submit">Submit</button>
+              <button type="submit" className="btn btn-primary w-100">Submit</button>
             </div>
           </form>
         </div>
