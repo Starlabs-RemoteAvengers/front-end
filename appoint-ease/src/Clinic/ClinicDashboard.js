@@ -2,10 +2,11 @@ import React from 'react';
 
 import Sidebar from '../Sidebar';
 
-const ClinicDashboard = () => {
+const ClinicDashboard = () =>
+{
   return (
     <div className="dashboard-container">
-      <Sidebar />
+      <Sidebar userRole='Clinic' />
     </div>
   );
 };

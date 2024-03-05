@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Sidebar from '../Sidebar';
 
-const ClinicProfile = ({ userId }) => {
+const ClinicProfile = ({ userId }) =>
+{
   const [clinic, setClinic] = useState(null);
   const [updatedClinic, setUpdatedClinic] = useState({
     userName: '',
@@ -19,27 +20,35 @@ const ClinicProfile = ({ userId }) => {
   });
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
 
-  useEffect(() => {
-    const fetchClinicData = async () => {
-      try {
+  useEffect(() =>
+  {
+    const fetchClinicData = async () =>
+    {
+      try
+      {
         const response = await fetch(`https://localhost:7207/api/Clinic/GetClinicById?clinicId=${userId}`);
 
-        if (response.ok) {
+        if (response.ok)
+        {
           const clinicData = await response.json();
           setClinic(clinicData);
           setUpdatedClinic(clinicData);
-        } else {
+        } else
+        {
           console.error('Failed to fetch clinic details:', response.statusText);
         }
-      } catch (error) {
+      } catch (error)
+      {
         console.error('Error during fetch:', error);
       }
     };
     fetchClinicData();
   }, [userId]);
 
-  const handleUpdateProfile = async () => {
-    try {
+  const handleUpdateProfile = async () =>
+  {
+    try
+    {
       const response = await fetch(`https://localhost:7207/api/Clinic/UpdateClinic/${userId}`, {
         method: 'PUT',
         headers: {
@@ -59,8 +68,9 @@ const ClinicProfile = ({ userId }) => {
           otherDetails: updatedClinic.otherDetails,
         }),
       });
-  
-      if (response.ok) {
+
+      if (response.ok)
+      {
         setShowSuccessAlert(true);
         const updatedData = await response.json();
         setClinic((prevClinic) => ({
@@ -68,16 +78,19 @@ const ClinicProfile = ({ userId }) => {
           otherDetails: updatedData.otherDetails,
         }));
         console.log('Clinic updated successfully!', updatedData);
-      } else {
+      } else
+      {
         const errorResponse = await response.json();
         console.error('Failed to update clinic:', errorResponse);
       }
-    } catch (error) {
+    } catch (error)
+    {
       console.error('Error during update:', error);
     }
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e) =>
+  {
     const { name, value } = e.target;
     setUpdatedClinic((prevClinic) => ({
       ...prevClinic,
@@ -87,7 +100,7 @@ const ClinicProfile = ({ userId }) => {
 
   return (
     <div className="container mt-4" style={{ maxWidth: '1000px', marginLeft: '5%', marginTop: '5%' }}>
-      <Sidebar />
+      <Sidebar userRole='Clinic' />
       <div className="mt-4">
         {clinic ? (
           <>

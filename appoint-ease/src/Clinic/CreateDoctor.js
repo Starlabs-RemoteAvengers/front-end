@@ -2,44 +2,52 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import '../Css/CreateDoctor.css';
 import Sidebar from '../Sidebar';
-const CreateDoctor = (userId) => {
-    const [doctors, setDoctors] = useState([]);
-    const actualUserId = userId.userId;
-    const [newDoctor, setNewDoctor] = useState({
-        userName: '',
-        name: '',
-        surname: '',
-        role: 'Doctor',
-        personalNumber: '',
-        email: '',
-        password: '',
-        phoneNumber: '',
-        dateOfBirth: '',
-        specialisation: '',
-        gender: '',
-        address: '',
-        clinicId: actualUserId,
-      });
+const CreateDoctor = (userId) =>
+{
+  const [doctors, setDoctors] = useState([]);
+  const actualUserId = userId.userId;
+  const [newDoctor, setNewDoctor] = useState({
+    userName: '',
+    name: '',
+    surname: '',
+    role: 'Doctor',
+    personalNumber: '',
+    email: '',
+    password: '',
+    phoneNumber: '',
+    dateOfBirth: '',
+    specialisation: '',
+    gender: '',
+    address: '',
+    clinicId: actualUserId,
+  });
 
-  useEffect(() => {
+  useEffect(() =>
+  {
     fetchDoctors();
   }, []);
 
-  const fetchDoctors = async () => {
-    try {
+  const fetchDoctors = async () =>
+  {
+    try
+    {
       const response = await fetch('https://localhost:7207/api/Doctor/GetAllDoctors');
-      if (response.ok) {
+      if (response.ok)
+      {
         const data = await response.json();
         setDoctors(data);
-      } else {
+      } else
+      {
         console.error('Failed to fetch doctors:', response.statusText);
       }
-    } catch (error) {
+    } catch (error)
+    {
       console.error('Error during fetch:', error);
     }
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e) =>
+  {
     const { name, value } = e.target;
     setNewDoctor({
       ...newDoctor,
@@ -47,8 +55,10 @@ const CreateDoctor = (userId) => {
     });
   };
 
-  const handleCreateDoctor = async () => {
-    try {
+  const handleCreateDoctor = async () =>
+  {
+    try
+    {
       const response = await fetch('https://localhost:7207/api/Doctor/CreateDoctor', {
         method: 'POST',
         headers: {
@@ -57,38 +67,41 @@ const CreateDoctor = (userId) => {
         body: JSON.stringify(newDoctor),
       });
 
-      if (response.ok) {
+      if (response.ok)
+      {
         fetchDoctors();
         setNewDoctor({
-        userName: '',
-        name: '',
-        surname: '',
-        role: 'Doctor',
-        personalNumber: '',
-        email: '',
-        password: '',
-        phoneNumber: '',
-        dateOfBirth: '',
-        specialisation: '',
-        gender: '',
-        address: '',
-        clinicId: actualUserId,
+          userName: '',
+          name: '',
+          surname: '',
+          role: 'Doctor',
+          personalNumber: '',
+          email: '',
+          password: '',
+          phoneNumber: '',
+          dateOfBirth: '',
+          specialisation: '',
+          gender: '',
+          address: '',
+          clinicId: actualUserId,
         });
 
         window.location.href = '/doctor-list';
-      } else {
+      } else
+      {
         console.error('Failed to create doctor:', response.statusText);
       }
-    } catch (error) {
+    } catch (error)
+    {
       console.error('Error during create:', error);
     }
   };
 
   return (
-    <div className="create-doctor-container" style={{ marginTop: '5%', marginLeft:'5%' }}>
+    <div className="create-doctor-container" style={{ marginTop: '5%', marginLeft: '5%' }}>
       <div className="row">
         <div className="col-md-3">
-          <Sidebar />
+          <Sidebar userRole='Clinic' />
         </div>
         <div className="col-md-9" >
           <h2>Create Doctor</h2>
@@ -177,7 +190,7 @@ const CreateDoctor = (userId) => {
         </div>
       </div>
     </div>
-  );  
+  );
 };
 
 export default CreateDoctor;
