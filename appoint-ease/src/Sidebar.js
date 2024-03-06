@@ -67,7 +67,7 @@ const Sidebar = ({ userRole }) => {
                     <i className="bi bi-house fs-4 me-2"></i>
                     <span>Dashboard</span>
                 </Link>
-            <Link to="/appointments" className={`list-group-item py-2 ${location.pathname === '/appointments' ? 'active' : ''}`}>
+            <Link to="/search-list" className={`list-group-item py-2 ${location.pathname === '/search-list' ? 'active' : ''}`}>
               <i className="bi bi-house fs-4 me-2"></i>
               <span>Appointments</span>
             </Link>

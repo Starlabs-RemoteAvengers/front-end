@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate   } from 'react-router-dom';
 import { Stack } from 'react-bootstrap';
 import Navbar from './Navbar';
 import RegisterPatient from './Patient/RegisterPatient';
@@ -16,6 +16,7 @@ import Homepage from './Homepage';
 import Footer from './Footer';
 import ResetPassword from './ResetPasswordComponent';
 import { createBrowserHistory } from 'history';
+import SearchList from './Search';
 
 const PrivateRoute = ({ element: Element, isLoggedIn, ...rest }) => (
   isLoggedIn ? <Route {...rest} element={<Element />} /> : <Navigate to="/" />
@@ -26,7 +27,9 @@ const App = () => {
   const [userRole, setUserRole] = useState('');
   const [token, setToken] = useState('');
   const [userId, setUserId] = useState('');
+
 const history = createBrowserHistory();
+
   const handleLogin = (role, token, userId) => {
     setIsLoggedIn(true);
     setUserRole(role);
@@ -37,10 +40,12 @@ const history = createBrowserHistory();
 
     if(role === 'Patient'){
     history.push('/patient-dashboard');
+    window.location.reload();
     }else if(role === 'Clinic'){
       history.push('/clinic-dashboard');
-    }
     window.location.reload();
+
+    }
 
   };
 
@@ -51,6 +56,7 @@ const history = createBrowserHistory();
     sessionStorage.removeItem('userData');
     history.push('/login');
     window.location.reload();
+
   };
 
   useEffect(() => {
@@ -63,9 +69,12 @@ const history = createBrowserHistory();
       setUserId(userId);
       if(!isLoggedIn){
         history.push('/home');
+    window.location.reload();
+
       }
     }
   }, []);
+;
 
   return (
     <Stack direction="vertical">
@@ -74,13 +83,24 @@ const history = createBrowserHistory();
         <Routes>
           {isLoggedIn ? (
             <>
+           {userRole === "Clinic" && (
+            <>
               <Route path="/clinic-dashboard" element={<ClinicDashboard />} />
-              <Route path="/patient-dashboard" element={<PatientDashboard />} />
-              <Route path="/doctor-list" element={<DoctorList userId={userId} />} />
-              <Route path="/create-doctor" element={<CreateDoctor userId={userId} />} />
               <Route path="/edit-doctor/:id" element={<EditDoctor />} />
               <Route path="/clinic-profile" element={<ClinicProfile userId={userId} />} />
+              <Route path="/create-doctor" element={<CreateDoctor userId={userId} />} />
+              <Route path="/doctor-list" element={<DoctorList userId={userId} />} />
+            </>
+          )}
+          {userRole === "Patient" && (
+            <>
+              <Route path="/patient-dashboard" element={<PatientDashboard />} />
               <Route path="/patient-profile" element={<PatientProfile userId={userId} />} />
+              <Route path="/search-list" element={<SearchList />} />
+            </>
+          )}
+              
+
             </>
           ) : (
             <>
@@ -89,9 +109,9 @@ const history = createBrowserHistory();
               <Route path="/register-clinic" element={<RegisterClinic />} />
               <Route path="/home" element={<Homepage />} />
               <Route path="/reset-password/:token" element={<ResetPassword />} />
+              <Route element={<Navigate to="/login" />} />
             </>
           )}
-          
         </Routes>
       </Router>
       <div className="static-content" style={{ width: '100%', overflowX: 'hidden' }}>
