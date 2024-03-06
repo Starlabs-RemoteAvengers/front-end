@@ -2,6 +2,7 @@ import React from 'react';
 import { Container, Row, Col, Card, Button, Image } from 'react-bootstrap';
 import background from './Images/61804.jpg';
 import background2 from './Images/3.jpg';
+import Calendar from './Calendar';
 
 
 const Homepage = () =>
@@ -257,6 +258,7 @@ const Homepage = () =>
 
                 </div>
             </div>
+
         </>
 
     );
