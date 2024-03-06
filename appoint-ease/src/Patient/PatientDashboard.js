@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Sidebar from '../Sidebar';
 import { Card } from 'react-bootstrap';
+import JournalEntry from '../JournalEntry';
 
 const PatientDashboard = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -11,8 +12,7 @@ const PatientDashboard = () => {
     const handleSearchChange = (event) => {
         setSearchTerm(event.target.value);
 
-        // Filtroni elementet e nevojshme këtu
-        const filtered = ["Item 1", "Item 2", "Item 3"]; // Për shembull, mund të jenë elementet e filtruara
+        const filtered = ["Item 1", "Item 2", "Item 3"];
         setFilteredItems(filtered);
     };
 
@@ -22,15 +22,16 @@ const PatientDashboard = () => {
                 <Sidebar userRole='Patient' />
             </div>
             <div className="row-md-9 col-lg-12 px-md-4">
+
                 <div className="my-5">
                     <h2>Patient Dashboard</h2>
                     <hr />
                     <div className="input-group mb-3">
-                        <input 
-                            type="text" 
-                            className="form-control" 
-                            placeholder="Search..." 
-                            aria-label="Search" 
+                        <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Search..."
+                            aria-label="Search"
                             aria-describedby="basic-addon2"
                             value={searchTerm}
                             onChange={handleSearchChange}
@@ -52,7 +53,7 @@ const PatientDashboard = () => {
                     )}
                 </div>
                 <div className="row">
-                    {/* Kartat e përditësuara për t'i përshtatur klasën e re */}
+                    { }
                     <div className="col-md-4 mb-4">
                         <Card style={{ width: '18rem' }}>
                             <Card.Body>
@@ -64,6 +65,7 @@ const PatientDashboard = () => {
                     <div className="col-md-4 mb-4">
                         <Card style={{ width: '18rem' }}>
                             <Card.Body>
+
                                 <Card.Title>Appointments In Progress</Card.Title>
                                 <Card.Text>{appointmentsPending}</Card.Text>
                             </Card.Body>
@@ -77,9 +79,13 @@ const PatientDashboard = () => {
                             </Card.Body>
                         </Card>
                     </div>
+                    <div>
+                        <JournalEntry />
+                    </div>
                 </div>
             </div>
         </div>
+
     );
 };
 
