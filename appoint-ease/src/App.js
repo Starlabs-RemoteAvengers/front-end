@@ -24,8 +24,8 @@ const PrivateRoute = ({ element: Element, isLoggedIn, ...rest }) => (
 );
 
 const App = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
-  const [userRole, setUserRole] = useState('Patient');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userRole, setUserRole] = useState('');
   const [token, setToken] = useState('');
   const [userId, setUserId] = useState('');
 
