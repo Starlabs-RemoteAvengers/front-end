@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate   } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { Stack } from 'react-bootstrap';
 import Navbar from './Navbar';
 import RegisterPatient from './Patient/RegisterPatient';
@@ -17,6 +17,7 @@ import Footer from './Footer';
 import ResetPassword from './ResetPasswordComponent';
 import { createBrowserHistory } from 'history';
 import SearchList from './Search';
+import JournalEntry from './JournalEntry';
 
 const PrivateRoute = ({ element: Element, isLoggedIn, ...rest }) => (
   isLoggedIn ? <Route {...rest} element={<Element />} /> : <Navigate to="/" />
@@ -28,7 +29,7 @@ const App = () => {
   const [token, setToken] = useState('');
   const [userId, setUserId] = useState('');
 
-const history = createBrowserHistory();
+  const history = createBrowserHistory();
 
   const handleLogin = (role, token, userId) => {
     setIsLoggedIn(true);
@@ -38,15 +39,12 @@ const history = createBrowserHistory();
     const userData = { isLoggedIn: true, userRole: role, token, userId };
     sessionStorage.setItem('userData', JSON.stringify(userData));
 
-    if(role === 'Patient'){
-    history.push('/patient-dashboard');
-    window.location.reload();
-    }else if(role === 'Clinic'){
+    if (role === 'Patient') {
+      history.push('/patient-dashboard');
+    } else if (role === 'Clinic') {
       history.push('/clinic-dashboard');
-    window.location.reload();
-
     }
-
+    window.location.reload();
   };
 
   const handleLogout = () => {
@@ -56,7 +54,6 @@ const history = createBrowserHistory();
     sessionStorage.removeItem('userData');
     history.push('/login');
     window.location.reload();
-
   };
 
   useEffect(() => {
@@ -67,14 +64,12 @@ const history = createBrowserHistory();
       setUserRole(userRole);
       setToken(token);
       setUserId(userId);
-      if(!isLoggedIn){
+      if (!isLoggedIn) {
         history.push('/home');
-    window.location.reload();
-
+        window.location.reload();
       }
     }
   }, []);
-;
 
   return (
     <Stack direction="vertical">
@@ -83,24 +78,23 @@ const history = createBrowserHistory();
         <Routes>
           {isLoggedIn ? (
             <>
-           {userRole === "Clinic" && (
-            <>
-              <Route path="/clinic-dashboard" element={<ClinicDashboard />} />
-              <Route path="/edit-doctor/:id" element={<EditDoctor />} />
-              <Route path="/clinic-profile" element={<ClinicProfile userId={userId} />} />
-              <Route path="/create-doctor" element={<CreateDoctor userId={userId} />} />
-              <Route path="/doctor-list" element={<DoctorList userId={userId} />} />
-            </>
-          )}
-          {userRole === "Patient" && (
-            <>
-              <Route path="/patient-dashboard" element={<PatientDashboard />} />
-              <Route path="/patient-profile" element={<PatientProfile userId={userId} />} />
-              <Route path="/search-list" element={<SearchList />} />
-            </>
-          )}
-              
-
+              {userRole === "Clinic" && (
+                <>
+                  <Route path="/clinic-dashboard" element={<ClinicDashboard />} />
+                  <Route path="/edit-doctor/:id" element={<EditDoctor />} />
+                  <Route path="/clinic-profile" element={<ClinicProfile userId={userId} />} />
+                  <Route path="/create-doctor" element={<CreateDoctor userId={userId} />} />
+                  <Route path="/doctor-list" element={<DoctorList userId={userId} />} />
+                </>
+              )}
+              {userRole === "Patient" && (
+                <>
+                  <Route path="/patient-dashboard" element={<PatientDashboard />} />
+                  <Route path="/patient-profile" element={<PatientProfile userId={userId} />} />
+                  <Route path="/search-list" element={<SearchList />} />
+                  <Route path="/journal-entry" element={<JournalEntry />} />
+                </>
+              )}
             </>
           ) : (
             <>
