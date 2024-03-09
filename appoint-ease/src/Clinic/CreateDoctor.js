@@ -83,6 +83,8 @@ const CreateDoctor = (userId) =>
           specialisation: '',
           gender: '',
           address: '',
+          photoData: '',
+          photoFormat: '',
           clinicId: actualUserId,
         });
 
@@ -96,6 +98,24 @@ const CreateDoctor = (userId) =>
       console.error('Error during create:', error);
     }
   };
+
+
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setNewDoctor((prevDoctor) => ({
+          ...prevDoctor,
+          photoData: reader.result.split(",")[1],
+          photoFormat: file.type.split("/")[1],
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  
+
 
   return (
     <div className="create-doctor-container" style={{ marginTop: '5%', marginLeft: '5%' }}>
@@ -178,6 +198,10 @@ const CreateDoctor = (userId) =>
             <div className="form-group">
               <label htmlFor="address">Address:</label>
               <input type="text" id="address" name="address" value={newDoctor.address} onChange={handleInputChange} />
+            </div>
+            <div className="form-group">
+              <label htmlFor="photo">Photo:</label>
+              <input type="file" id="photo" name="photo" accept="image/*" onChange={handlePhotoChange} />
             </div>
             <div className="form-group">
               <label htmlFor="clinicId">Clinic ID:</label>

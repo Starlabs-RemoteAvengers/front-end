@@ -1,8 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { Container, Row, Col, Image, Button, Tab, Nav } from 'react-bootstrap';
+import {  useParams } from 'react-router-dom';
 
 const UserProfileCard = () => {
   const [activeTab, setActiveTab] = useState('details');
+  const { userId } = useParams();
+
+
+  useEffect(() => {
+    console.log(userId);
+
+    //
+}, [userId]);
+
 
   return (
     <>
