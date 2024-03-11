@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../Sidebar'; // Importimi i Sidebar
+import MessageComponent from '../Messages/MessageComponent';
 
 function PatientProfile({ userId })
 {
-    const [updateSuccess, setUpdateSuccess] = useState(false);
+    const [message, setMessage] = useState(false);
+    const [apiMessage, setApiMessage] = useState(null);
     const [errors, setErrors] = useState({});
     const [formData, setFormData] = useState({
         userName: '',
@@ -114,7 +116,11 @@ function PatientProfile({ userId })
 
                 if (response.ok)
                 {
-                    setUpdateSuccess(true);
+                    console.log(response.statusText);
+                    response.json().then((data) => {
+                        setApiMessage(data); // Vendosni rezultatin e përfunduar të "Promise" në const "apiMessage"
+                    });
+                    setMessage(true);
                 } else
                 {
                     console.error('Failed to update Patient:', response.statusText);
@@ -138,10 +144,8 @@ function PatientProfile({ userId })
                         <h3>Patient Profile</h3>
                         <hr />
                     </div>
-                    {updateSuccess && (
-                        <div className="alert alert-success" role="alert">
-                            Patient updated successfully!
-                        </div>
+                    {message && (
+                       <MessageComponent message={apiMessage}/>
                     )}
                     <form className="file-upload" onSubmit={handleSubmit}>
                         <div className="form-group">
