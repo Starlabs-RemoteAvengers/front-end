@@ -153,7 +153,7 @@ const fetchDoctors = async () => {
         }
         const data = await response.json();
         setDoctors(data); 
-       setLoading(false);
+      setLoading(false);
     } catch (error) {
       setLoading(false);
         console.error('Error fetching doctors:', error);
@@ -189,6 +189,7 @@ const fetchDoctors = async () => {
             ))
           )}
          
+          {/* Butoni për të ngarkuar më shumë mjekë */}
           
         </div>
       </div>
