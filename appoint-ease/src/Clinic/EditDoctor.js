@@ -19,6 +19,7 @@ const EditDoctor = ({ match }) =>
     specialisation: '',
     gender: '',
     address: '',
+    description: '',
     clinicId: '',
   });
 
@@ -162,6 +163,10 @@ const EditDoctor = ({ match }) =>
         <div className="form-group">
           <label htmlFor="address">Address:</label>
           <input type="text" id="address" name="address" value={existingDoctor.address} onChange={handleInputChange} />
+        </div>
+        <div className="form-group">
+          <label htmlFor="description">Description:</label>
+          <input type="text" id="description" name="description" value={existingDoctor.description} onChange={handleInputChange} />
         </div>
         <div className="form-group">
           <label htmlFor="clinicId">Clinic ID:</label>

@@ -105,6 +105,7 @@ const DoctorList = ({ userId }) =>
                 <th>Date of Birth</th>
                 <th>Gender</th>
                 <th>Address</th>
+                <th>Description</th>
                 <th>Clinic Name</th>
                 <th>Action</th>
               </tr>
@@ -121,6 +122,7 @@ const DoctorList = ({ userId }) =>
                   <td>{doctor.dateOfBirth}</td>
                   <td>{doctor.gender}</td>
                   <td>{doctor.address}</td>
+                  <td>{doctor.description}</td>
                   <td>{getClinicName(doctor.clinicId)}</td>
                   <td>
                     <Link to={`/edit-doctor/${doctor.id}`} className="btn btn-primary ml-2">
