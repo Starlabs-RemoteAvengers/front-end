@@ -1,9 +1,8 @@
-// UserProfileCard.js
-
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Image, Button, Tab, Nav } from 'react-bootstrap';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import './Css/VisitProfile.css';
+import Sidebar from './Sidebar';
 
 const UserProfileCard = () => {
   const [activeTab, setActiveTab] = useState('details');
@@ -30,6 +29,7 @@ const UserProfileCard = () => {
 
   return (
     <>
+    <Sidebar userRole={'Patient'}/>
       <div className='container-fluid my-5'>
         <Row className="profile-row">
           <div className='d-flex align-items-center border rounded p-3 shadow smaller-box'>
@@ -44,9 +44,11 @@ const UserProfileCard = () => {
                 <p>📍{doctor.address}</p>
               </div>
               <div className="mt-auto text-right">
+              <Link to={`/appointment-slot-list-for-patient/${doctor.id}`} style={{ marginRight:'-90%'}}>
                 <Button variant="primary" className="custom-book-btn align-self-end">
                   BOOK APPOINTMENT
                 </Button>
+              </Link>
               </div>
             </Col>
           </div>
