@@ -4,6 +4,7 @@ import 'react-calendar/dist/Calendar.css';
 import moment from 'moment';
 import { Button, Container, Row, Col, Form } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
+import MessageComponent from '../Messages/MessageComponent';
 
 const BookAppointment = (userId) => {
   const UserId = userId.userId;
@@ -16,6 +17,7 @@ const BookAppointment = (userId) => {
   const [isAccepted, setIsAccepted] = useState(false);
   const [responseDateTime, setResponseDateTime] = useState(null);
   const [isBookingInProgress, setIsBookingInProgress] = useState(false);
+  const [errorMessage, setErrorMessage]=useState(null);
 
   useEffect(() => {
     fetchAppointmentSlots();
@@ -67,7 +69,17 @@ const bookAppointment = async () => {
           body: JSON.stringify(requestBody),
       });
       if (response.ok) {
-        console.log('Appointment booked successfully');
+        const responseData = await response.json();
+        if (responseData.succeeded === true) {
+          console.log('Operation succeeded: true');
+          setErrorMessage(responseData);
+          console.log(responseData);
+          window.location.href='/my-patient-appointments';
+        } else {
+          console.log('Operation succeeded: false');
+          setErrorMessage(responseData);
+          console.log(responseData);
+        }
       } else {
           console.error('Failed to book appointment:', response.statusText);
           console.log('Request body:', JSON.stringify(requestBody));
