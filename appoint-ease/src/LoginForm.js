@@ -4,12 +4,14 @@ import EmailConfirmationMessage from './EmailConfirmationMessage';
 import { Col, Button, Row, Container, Card, Form } from "react-bootstrap";
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { createBrowserHistory } from 'history';
+import MessageComponent from './Messages/MessageComponent';
 
 
 const LoginForm = ({ handleLogin }) =>
 {
   const history = createBrowserHistory ();
-
+  const [message, setMessage] = useState(false);
+  const [apiMessage, setApiMessage] = useState(null);
 
   const [showEmailConfirmationMessage, setShowEmailConfirmationMessage] = useState(false);
   const [loginFailed, setLoginFailed] = useState(false);
@@ -113,7 +115,15 @@ const LoginForm = ({ handleLogin }) =>
       });
       if (response.ok)
       {
-        handleCloseForgotPassword();
+        response.json().then((data) => {
+          setApiMessage(data); 
+          if(data.succeeded){
+            handleCloseForgotPassword();
+          }
+          else{
+            setMessage(true);
+          }
+      });
       }
     }
 
@@ -127,6 +137,7 @@ const LoginForm = ({ handleLogin }) =>
   return (
     <div>
       <Container>
+    
         <Row className="vh-100 w-100 d-flex justify-content-center align-items-center">
           <Col md={8} lg={6} xs={12}>
             <Card className="shadow">
@@ -193,6 +204,9 @@ const LoginForm = ({ handleLogin }) =>
         </Offcanvas.Header>
         <Offcanvas.Body className='h-100'>
           <>
+          {message && (
+          <MessageComponent message={apiMessage}/>
+         )}
             <form onSubmit={handleSubmitForgotPassword}>
               <div className="mb-3">
                 <label htmlFor="email" className="form-label">Email Address</label>

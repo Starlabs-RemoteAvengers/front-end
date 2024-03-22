@@ -11,7 +11,6 @@ import DoctorList from './Clinic/DoctorList';
 import EditDoctor from './Clinic/EditDoctor';
 import ClinicProfile from './Clinic/ClinicProfile';
 import PatientDashboard from './Patient/PatientDashboard';
-import PatientProfile from './Patient/PatientProfile';
 import Homepage from './Homepage';
 import Footer from './Footer';
 import ResetPassword from './ResetPasswordComponent';
@@ -28,6 +27,7 @@ import AppointmentSlotListForPatient from './Clinic/AppointmentSlotListForPatien
 import BookAppointmentRequests from './Doctor/BookAppointmentRequests';
 import MyPatientAppointments from './Patient/MyPatientAppointments';
 import MySchedule from './Doctor/MySchedule';
+import ChatApp from './Chat/ChatComponent';
 
 const PrivateRoute = ({ element: Element, isLoggedIn, ...rest }) => (
   isLoggedIn ? <Route {...rest} element={<Element />} /> : <Navigate to="/" />
@@ -104,7 +104,6 @@ const history = createBrowserHistory();
           {userRole === "Patient" && (
             <>
               <Route path="/patient-dashboard" element={<PatientDashboard />} />
-              <Route path="/patient-profile" element={<PatientProfile userId={userId} />} />
               <Route path="/search-list" element={<SearchList />} />
               <Route path="/appointment-slot-list" element={<AppointmentSlotList userId={userId} />} />
               <Route path="/appointment-slot-list-for-patient/:doctorId" element={<AppointmentSlotListForPatient userId={userId} />} />
@@ -116,6 +115,9 @@ const history = createBrowserHistory();
             <>
               <Route path="/book-appointment-requests" element={<BookAppointmentRequests userId={userId} />} />
               <Route path="/my-schedule" element={<MySchedule userId={userId} />} />
+              <Route path="/patient-profile" element={<ProfileSettings patientId={userId} />} />
+
+              
             </>
           )}
               <Route path="/profile-card/:userId" element={<UserProfileCard />} />
@@ -135,8 +137,8 @@ const history = createBrowserHistory();
 
             </>
           )}
-            <Route path="/test-t" element={<ProfileSettings />} />
 
+            <Route path="/chat" element={<ChatApp />} />
             <Route path="/*" element={isLoggedIn ? <Navigate to="/home" /> : <UnauthorizedPage />} />
         </Routes>
 
