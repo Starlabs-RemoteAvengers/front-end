@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../Sidebar';
-import MyPendingAppointments from './MyPendingAppointments.js';
+import MyPendingAppointments from './MyPendingAppointments';
 
 function MyPatientAppointments() {
     const [appointments, setAppointments] = useState([]);

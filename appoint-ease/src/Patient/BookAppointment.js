@@ -59,7 +59,7 @@ const bookAppointment = async () => {
           bookAppointmentStatus:'Pending',
           responseDateTime
       };
-
+      
       // Create appointment
       const response = await fetch('https://localhost:7207/api/BookAppointment/CreateBookAppointment', {
           method: 'POST',
@@ -186,8 +186,6 @@ return (
     </Row>
   </Container>
 );
-
-
 };
 
 export default BookAppointment;

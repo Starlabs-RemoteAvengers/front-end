@@ -133,7 +133,6 @@ const RegisterPatient = () => {
           }
           break;
         
-        
           case 'dateOfBirth':
             // Check if date of birth is provided
             if (!value) {
@@ -143,20 +142,19 @@ const RegisterPatient = () => {
               });
               break;
             }
-          
+        
             // Calculate the user's age based on the provided date of birth
             const dob = new Date(value);
             const today = new Date();
             let age = today.getFullYear() - dob.getFullYear();
-          
-            // Adjust age if the user's birthday hasn't occurred yet this year
+
             if (
               dob.getMonth() > today.getMonth() ||
               (dob.getMonth() === today.getMonth() && dob.getDate() > today.getDate())
             ) {
               age--;
             }
-          
+
             // Check if the user is at least 18 years old
             if (age < 18) {
               setFormErrors({
@@ -170,7 +168,7 @@ const RegisterPatient = () => {
               });
             }
             break;
-          
+
     }
   };
 
