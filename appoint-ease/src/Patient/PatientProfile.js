@@ -1,262 +1,376 @@
-import React, { useState, useEffect } from 'react';
-import Sidebar from '../Sidebar';
-import MessageComponent from '../Messages/MessageComponent';
+import React, {useEffect,useState} from 'react';
+import { useParams,Link } from 'react-router-dom';
+import { Container, Row, Col, Card, Button, Breadcrumb } from 'react-bootstrap';
+import { FaUserPlus, FaPlus, FaTimes, FaHourglassStart, FaCheck } from 'react-icons/fa';
+import { format } from 'date-fns';
+import { Spinner,Modal } from 'react-bootstrap';
+import NotificationService from '../SiganlR/NotificationSender';
+import { CiBookmarkRemove } from "react-icons/ci";
+import sendNotification from '../SiganlR/NotificationSender';
 
-const PatientProfile = ({ userId }) => {
-  const [message, setMessage] = useState(false);
-  const [apiMessage, setApiMessage] = useState(null);
-  const [formErrors, setFormErrors] = useState({
-    userName: '',
-    name: '',
-    surname: '',
-    email: '',
-    address: '',
-    phoneNumber: '',
-    gender: '',
-    dateOfBirth: '',
-  });
-  const [formData, setFormData] = useState({
-    userName: '',
-    name: '',
-    surname: '',
-    personalNumber: '',
-    email: '',
-    address: '',
-    phoneNumber: '',
-    password: null,
-    gender: '',
-    dateOfBirth: '',
-    role: 'Patient',
-  });
+export default function ProfilePage({signalRHub}) {
+  const { userId } = useParams();
+  const [userData, setUserData] = useState(null);
+  const [connectionType, setConnectionType] = useState(null);
+  const [idRequest,setIdRequest] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [showModal1, setShowModal1] = useState(false);
+  const [canMessage, setCanMessage] = useState(false);
+
+  const handleClose = () => setShowModal1(false);
+  const handleShow = () => setShowModal1(true);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchUserData = async () => {
       try {
-        const response = await fetch(`https://localhost:7207/api/Patient/GetPatientById/?patientId=${userId}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (response.ok) {
-          const patientData = await response.json();
-          setFormData(patientData);
-        } else {
-          console.error('Failed to fetch patient data:', response.statusText);
+        const response = await fetch(`https://localhost:7207/api/Patient/GetPatientById/?patientId=${userId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch user data');
         }
+        const userData = await response.json();
+        setUserData(userData);
+        console.log(userData);
       } catch (error) {
-        console.error('Error during fetching patient data:', error);
+        console.error(error);
       }
     };
 
-    fetchData();
-  }, [userId]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevPatient) => ({
-      ...prevPatient,
-      [name]: value
-    }));
-
-    // Validate each field as it's being typed
-    validateField(name, value);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    // Validation of data before submitting the form
-    const errors = {};
-    Object.keys(formData).forEach((fieldName) => {
-      validateField(fieldName, formData[fieldName]);
-    });
-    setFormErrors(errors);
-
-    // If there are no errors, then submit the form
-    if (Object.keys(errors).length === 0) {
+    const CheckForFriendRequest = async () => {
       try {
-        const response = await fetch(`https://localhost:7207/api/Patient/UpdatePatient/${userId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formData),
-        });
-
-        if (response.ok) {
-          console.log(response.statusText);
-          const responseData = await response.json();
-          setApiMessage(responseData);
-          setMessage(true);
-        } else {
-          console.error('Failed to update Patient:', response.statusText);
-        }
+          const loginId = localStorage.getItem('userId');
+          const response = await fetch(`https://localhost:7207/api/RequestConnection/CheckConnection?userId=${loginId}&touserId=${userId}`, {
+              method: 'GET',
+              headers: {
+                  'Content-Type': 'application/json'
+              }
+          });
+  
+          if (response.ok) {
+              const data = await response.json();
+              setConnectionType(data.type);
+              setIdRequest(data.idRequest);
+          } else {
+              console.error('Network response was not ok');
+          }
       } catch (error) {
-        console.error('Error during update:', error);
+          console.error('Error:', error);
       }
+  }
+  
+   CheckForFriendRequest();
+    fetchUserData();
+  }, [userId]); 
+
+  useEffect(()=>{
+    setLoading(userData === null);
+  },[userData])
+
+  const handleRejectConnection = async()=>{
+    try {
+      const fetchData = await fetch(`https://localhost:7207/api/RequestConnection/CancelRequestConnection?idRequest=${idRequest}`,{
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+  
+    if(fetchData.ok){
+        const response = await fetchData.json();
+        if(response.succeeded === true){
+            setConnectionType("NotExist");
+        }
     }
-  };
+      
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  const handleAddConnection = () => {
+    // Logic for adding connection based on the connection type
+    switch (connectionType) {
+      case 'Accepted':
+        const RemoveFromFriendList = async () =>{
+          const fetchData = await fetch(`https://localhost:7207/api/Connections/DeleteFromFriends?userId=${localStorage.getItem('userId')}&friendId=${userId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+        if(fetchData.ok){
+          const data = await fetchData.json();
+          console.log(data);
+          setConnectionType("NotExist");
+        }
+        }
+        RemoveFromFriendList();
+        break;
+      case 'Pending':
+        const RemoveFromList = async() =>{
+          try {
+            const fetchData = await fetch(`https://localhost:7207/api/RequestConnection/CancelRequestConnection?idRequest=${idRequest}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            });
+        
+            if (fetchData.ok) {
+                const data = await fetchData.json();
+                setConnectionType("NotExist");
+  
+            } else {
+                console.error('Network response was not ok');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+        
+        }
+        RemoveFromList();
+        break;
+      case 'Waiting':
+        
+       const AcceptUser = async()=>{
+            try {
+              const fetchData = await fetch(`https://localhost:7207/api/RequestConnection/AcceptRequest?Id=${idRequest}`, {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json'
+                  },
+              });
 
-  const validateField = (fieldName, value) => {
-    switch (fieldName) {
-      case 'userName':
-      case 'name':
-      case 'surname':
-      case 'address':
-      case 'gender':
-        setFormErrors({
-          ...formErrors,
-          [fieldName]: value ? '' : `${fieldName} is required`,
-        });
+              if (fetchData.ok){
+                  setConnectionType("Accepted");
+                  sendNotification(signalRHub, 'Accepted', `${userData.name} ${userData.surname} is your new friend on the list`, userId, 'System', '', 'info');
+              }
+              
+          } catch (error) {
+              console.log("Error during accept request: ",error);
+          }
+       }
+       AcceptUser();
+  
+  
+  
+  
         break;
-      case 'email':
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        setFormErrors({
-          ...formErrors,
-          email: emailRegex.test(value)
-            ? ''
-            : 'Please enter a valid email address (e.g., example@example.com)',
-        });
-        break;
-        case 'dateOfBirth':
+      case 'NotExist':
+        const AddToList = async () => {
+          try {
+            const loginId = localStorage.getItem('userId');
             const currentDate = new Date();
-            const inputDate = new Date(value);
-            const ageDifference = currentDate.getFullYear() - inputDate.getFullYear();
-            const hasReachedMinimumAge = ageDifference > 18 || (ageDifference === 18 && currentDate.getMonth() >= inputDate.getMonth() && currentDate.getDate() >= inputDate.getDate());
+            const formattedDateTime = currentDate.toISOString().slice(0, -1);
+  
+              const requestData = {
+                  requestId: "null",
+                  fromId:loginId ,
+                  toId: userId,
+                  dateTimestamp: formattedDateTime
+              };
+              console.log(requestData);
+      
+              const fetchData = await fetch(`https://localhost:7207/api/RequestConnection/AddConnection`, {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(requestData) // Dërgoni instancën e klases në trupin e kërkesës
+              });
+      
+              if (fetchData.ok) {
+                  const data = await fetchData.json();
+                  if (data.success === true) {
+                    setIdRequest(data.idRequest);
+                    setConnectionType("Pending");
+                    sendNotification(signalRHub, 'Friend Request', `You have a new request from ${userData.name} ${userData.surname}`, userId, 'System', '', 'info');
 
-            if (!value || !hasReachedMinimumAge) {
-                setFormErrors({
-                ...formErrors,
-                dateOfBirth: 'You must be at least 18 years old to register',
-                });
-            } else {
-                setFormErrors({
-                ...formErrors,
-                dateOfBirth: '',
-                });
-            }
-        break;
-        case 'personalNumber':
-            if (!value || value.length !== 10 || !/^\d+$/.test(value)) {
-              setFormErrors({
-                ...formErrors,
-                personalNumber: 'Personal number must be 10 digits long and contain only numbers',
-              });
-            } else {
-              setFormErrors({
-                ...formErrors,
-                personalNumber: '',
-              });
-            }
-            break;
-            case 'phoneNumber':
-                if (!value || !/^\d+$/.test(value)) {
-                  setFormErrors({
-                    ...formErrors,
-                    phoneNumber: 'Phone number must contain only numbers',
-                  });
                 } else {
-                  setFormErrors({
-                    ...formErrors,
-                    phoneNumber: '',
-                  });
+                    console.error('Your request connection failed.');
                 }
-            break;
+              } else {
+                  console.error('Network response was not ok');
+              }
+          } catch (error) {
+              console.error('Error:', error);
+          }
+      }
+        AddToList();
+        break;
       default:
         break;
     }
-  };
+  }
 
-  const handlePhotoChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData((prevFormData) => ({
-          ...prevFormData,
-          photoData: reader.result.split(",")[1],
-          photoFormat: file.type.split("/")[1],
-        }));
-      };
-      reader.readAsDataURL(file);
+  const renderConnectionButton = () => {
+    switch (connectionType) {
+      case 'Accepted':
+        return (
+          <Button variant="danger" onClick={handleAddConnection}>
+            <FaTimes className="mr-2" /> Remove
+          </Button>
+        );
+      case 'Pending':
+        return (
+          <Button variant="warning" onClick={handleAddConnection}>
+            <FaHourglassStart className="mr-2" /> Pending
+          </Button>
+        );
+      case 'Waiting':
+        return (
+          <>
+            <Button variant="info" onClick={handleAddConnection}>
+              <FaCheck className="mr-2" fontSize={15}/> Accept
+            </Button>
+            <Button variant="danger" className='mx-1' onClick={handleRejectConnection}>
+              <CiBookmarkRemove className="mr-2" fontSize={15}/> Reject
+            </Button>
+          </>
+        );
+      case 'NotExist':
+        return (
+          <Button variant="primary" onClick={handleAddConnection}>
+            <FaUserPlus className="mr-2" /> Add
+          </Button>
+        );
+      default:
+        return null;
     }
-  };
-  return (
-    <div className="col-py-9">
-      <div className="row-md-1">
-        <Sidebar userRole='Patient' />
-      </div>
-      <div className="row-md-5 d-flex justify-content-center">
-        <div className="w-75">
-          <div className="my-5">
-            <h3>Patient Profile</h3>
-            <hr />
-          </div>
-          {message && (
-            <MessageComponent message={apiMessage}/>
-          )}
-          <form className="file-upload" onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label>Username</label>
-              <input type="text" className="form-control" name="userName" value={formData.userName} onChange={handleChange} />
-              {formErrors.userName && <div className="text-danger">{formErrors.userName}</div>}
-            </div>
-            <div className="form-group">
-              <label>Name</label>
-              <input type="text" className="form-control" name="name" value={formData.name} onChange={handleChange} />
-              {formErrors.name && <div className="text-danger">{formErrors.name}</div>}
-            </div>
-            <div className="form-group">
-              <label>Surname</label>
-              <input type="text" className="form-control" name="surname" value={formData.surname} onChange={handleChange} />
-              {formErrors.surname && <div className="text-danger">{formErrors.surname}</div>}
-            </div>
-            <div className="form-group">
-              <label>Personal Number</label>
-              <input type="text" className="form-control" name="personalNumber" value={formData.personalNumber} onChange={handleChange} />
-              {formErrors.personalNumber && <div className="text-danger">{formErrors.personalNumber}</div>}
-            </div>
-            <div className="form-group">
-              <label>Email</label>
-              <input type="email" className="form-control" name="email" value={formData.email} onChange={handleChange} />
-              {formErrors.email && <div className="text-danger">{formErrors.email}</div>}
-            </div>
-            <div className="form-group">
-              <label>Address</label>
-              <input type="text" className="form-control" name="address" value={formData.address} onChange={handleChange} />
-              {formErrors.address && <div className="text-danger">{formErrors.address}</div>}
-            </div>
-            <div className="form-group">
-              <label>Phone Number</label>
-              <input type="text" className="form-control" name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} />
-              {formErrors.phoneNumber && <div className="text-danger">{formErrors.phoneNumber}</div>}
-            </div>
-            <div className="form-group">
-              <label>Gender</label>
-              <select className="form-control" name="gender" value={formData.gender} onChange={handleChange}>
-                <option>Select Gender</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-              </select>
-              {formErrors.gender && <div className="text-danger">{formErrors.gender}</div>}
-            </div>
-            <div className="form-group">
-              <label>Date of Birth</label>              
-              <input type="date" className="form-control" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} />
-              {formErrors.dateOfBirth && <div className="text-danger">{formErrors.dateOfBirth}</div>}
-            </div>
-            <div className="form-group">
-              <label htmlFor="photo">Photo:</label>
-              <input type="file" id="photo" name="photo" accept="image/*" onChange={handlePhotoChange} />
-            </div>
-            <button type="submit" className="btn btn-primary w-100">Update</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  );
+  }
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+        return "Invalid Date";
+    }
+    return format(date, 'dd MMM, yyyy');
+};
+const handleToMessage = () => {
+  try {
+    if (connectionType !== 'Accepted') {
+      handleShow();
+      setCanMessage(false);
+    } else {
+      setCanMessage(true);
+    }
+  } catch (error) {
+    console.log(error);
+  }
 };
 
-export default PatientProfile;
+  return (
+    <section style={{ backgroundColor: '#eee' }}>
+      <Container className="py-5">
+      {loading && 
+             <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '100%' }}>
+             <Spinner animation="border" role="status">
+               <span className="sr-only">Loading...</span>
+             </Spinner>
+           </div>
+        }
+         {userData && (
+          <>
+        <Row className='w-100'>
+          <Col md={12}>
+            <Row className='justify-content-center w-100'>
+              <Col lg="5">
+                <Card className="mb-4">
+                  <Card.Body className="text-center">
+                  {userData && (
+                    <>
+                      <Card.Img
+                        src={`data:image/${userData.photoFormat};base64,${userData.photoData}`} 
+                        alt="avatar"
+                        className="rounded-circle"
+                        style={{ width: '150px' }}
+                        fluid 
+                      />
+                      <p className="text-muted mb-1">Role: {userData.role}</p>
+                      <p className="text-muted mb-4">📍{userData.address}</p>
+                      <p className="text-muted mb-4">Gender: {userData.gender}</p>
+                      <div className="d-flex justify-content-center mb-2">
+                        {renderConnectionButton()}
+                        <Link to={canMessage ? `/chat/${userData.userId}` : ''}>
+                          <Button variant="outline" className="ms-1" onClick={handleToMessage}>Message</Button>
+                        </Link>
 
+                      </div>
+                    </>
+                  )}
+                  </Card.Body>
+                </Card>
+              </Col>
+              <Col lg="6">
+                <Card className="mb-4">
+                  <Card.Body>
+                  {userData &&
+                  <>
+                    <Row>
+                      <Col sm="3">
+                        <p>Full Name</p>
+                      </Col>
+                      <Col sm="9">
+                        <p className="text-muted">{userData.name + ' ' + userData.surname}</p>
+                      </Col>
+                    </Row>
+                    <hr />
+                    <Row>
+                      <Col sm="3">
+                        <p>Email</p>
+                      </Col>
+                      <Col sm="9">
+                        <p className="text-muted">{userData.email}</p>
+                      </Col>
+                    </Row>
+                    <hr />
+                    <Row>
+                      <Col sm="3">
+                        <p>Phone</p>
+                      </Col>
+                      <Col sm="9">
+                        <p className="text-muted">{userData.phoneNumber}</p>
+                      </Col>
+                    </Row>
+                    <hr />
+                    <Row>
+                      <Col sm="3">
+                        <p>Mobile</p>
+                      </Col>
+                      <Col sm="9">
+                        <p className="text-muted">{userData.phoneNumber}</p>
+                      </Col>
+                    </Row>
+                    <hr />
+                    <Row>
+                      <Col sm="3">
+                        <p>Birthday</p>
+                      </Col>
+                      <Col sm="9">
+                        <p className="text-muted">{formatDate(userData.dateOfBirth)}</p>
+                      </Col>
+                    </Row>
+                    </>
+                    }
+                  </Card.Body>
+                </Card>
+                
+              </Col>
+            </Row>
+          </Col>
+        </Row>
+        </>
+       ) }
+       <Modal show={showModal1} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Reminder!</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>First, you need to establish a connection with this person before you chating!</Modal.Body>
+                <Modal.Footer>
+                <Button variant="secondary" onClick={handleClose}>
+                    Close
+                </Button>
+                </Modal.Footer>
+            </Modal>
+      </Container>
+    </section>
+  );
+}
