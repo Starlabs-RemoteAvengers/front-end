@@ -1,5 +1,6 @@
-const sendNotification = (signalRHub,subject, message,toId,type,typeId,messageType) => {
-  const id = localStorage.getItem('userId');
+const sendNotification = (signalRHub,subject, message,toId,type,typeId,messageType,fromid = null) => {
+
+  const id = fromid === null ? localStorage.getItem('userId'): fromid;
   const currentDate = new Date();
 
   const notificationRequest = {
